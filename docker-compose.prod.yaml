@@ -1,0 +1,66 @@
+services:
+
+  php:
+    image: mctekk/phalconphp:7.4-debian
+    volumes:
+      - .:/app
+      -  ./storage/ci/php.ini-production:/usr/local/etc/php/php.ini
+      -  ./storage/ci/php_fpm_production.conf:/usr/local/etc/php-fpm.d/zzz-php-fpm-production.conf
+    tty: true
+    ports:
+      - "9000:9000"
+    networks:
+      - local-network
+    
+  nginx:
+    image: nginx:latest
+    ports:
+    - "80:80"
+    links:
+    - php
+    volumes:
+    - .:/app
+    - ./storage/ci/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - local-network
+      - public-network
+        
+  queue:
+    image: mctekk/phalconphp:7.4-cli
+    container_name: kanvas-queue
+    working_dir: /app
+    command: ./runCli queue jobs
+    volumes:
+    - .:/app
+    -  ./storage/ci/php.ini-production:/usr/local/etc/php/php.ini
+    restart: always
+    tty: true
+    networks:
+    - local-network
+
+  queueEvents:
+    image: mctekk/phalconphp:7.4-cli
+    container_name: kanvas-queue-events
+    working_dir: /app
+    command: ./runCli queue events
+    volumes:
+    - .:/app
+    -  ./storage/ci/php.ini-production:/usr/local/etc/php/php.ini
+    restart: always
+    tty: true
+    networks:
+    - local-network
+
+  queueNotification:
+    image: mctekk/phalconphp:7.4-cli
+    container_name: kanvas-queue-notifications
+    working_dir: /app
+    command: ./runCli queue notifications
+    volumes:
+    - .:/app
+    -  ./storage/ci/php.ini-production:/usr/local/etc/php/php.ini
+    restart: always
+    tty: true
+networks:
+  local-network:
+  public-network:

@@ -1,0 +1,103 @@
+name: Kanvas api CI/CD
+
+on:
+#   schedule:
+#     - cron: '41 6 * * *'
+  push:
+
+  workflow_dispatch:
+
+env:
+ #The next var creates the custom name for the current deployment to be referenced as ${{ env.instance_name }}
+ #The var '${GITHUB_REPOSITORY#*/}' is traduced to the name of the repository, and the var '${GITHUB_REF##*/}' is traduced to the source branch
+ #The varset  '${{ env.instance_name }}' is <repository name>-branch EG; kanvasapi-development.      
+  cluser_name: development-booklounge
+
+jobs:
+  build_and_deploy:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+  
+      - name: Install Kubernetes toolset
+        uses: stefanprodan/kube-tools@v1.6.0
+
+      - name: Set source branch
+        run: |
+          echo instance_name=`echo ${GITHUB_REPOSITORY#*/}-${GITHUB_REF##*/}` >> $GITHUB_ENV
+                
+      - name: Configure .env vars
+        run: |
+           cat <<EOF > .env
+
+           ${{ secrets.DEVELOPMENT_VARS }} 
+           EOF
+           
+      - name: AWS ECR
+        uses: kciter/aws-ecr-action@v4
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: 346494590871
+          repo: ${{ env.instance_name }}
+          region: us-east-1
+          create_repo: true
+
+      - name: Deploy helm chart
+        run: |
+            #configure aws login
+            
+            if rm -rf /home/runner/.aws
+            then
+            echo old credentials removed
+            fi
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws eks update-kubeconfig   --region us-east-1   --name ${{ env.cluser_name }}
+            
+
+            #create namespace if not exists
+            
+            if kubectl describe namespace ${{ env.instance_name }}
+            then   
+            echo namespace ${{ env.instance_name }} already exists
+            else    
+            kubectl create namespace ${{ env.instance_name }}
+            fi
+
+            
+            #deploy or upgrade helm chart
+            
+            if helm get manifest ${{ env.instance_name }}
+            then
+            echo upgrading chart ${{ env.instance_name }}
+            kubectl rollout restart deployment -n ${{ env.instance_name }}
+            echo "wating for complete uninstall"
+            else
+            echo installing chart ${{ env.instance_name }}
+            helm install ${{ env.instance_name }} helm --set namespace=${{ env.instance_name }} --set apiImage=346494590871.dkr.ecr.us-east-1.amazonaws.com/${{ env.instance_name }}:latest
+            fi
+
+      - name: Readme for details
+        run: |
+            #show deployed values
+            if helm get manifest ${{ env.instance_name }} | grep nothing
+            then
+            echo if you are running on a principal branch, there will be another well known url for this app
+            echo The aplication url is bellow at "EXTERNAL-IP" column
+            kubectl get svc -n ${{ env.instance_name }}
+            else
+            echo Because this is the first deployment, we are waiting for complete the loadbalancer creation
+            sleep 80
+            echo if you are running on a principal branch, there will be another well known url for this app
+            echo The aplication url is bellow at "EXTERNAL-IP" column
+            kubectl get svc -n ${{ env.instance_name }}
+            fi
+
+    

@@ -1,0 +1,83 @@
+<?php
+declare(strict_types=1);
+
+namespace Gewaer\Domains\Rooms\Models;
+
+use Baka\Contracts\Auth\UserInterface;
+use Gewaer\Domains\Lounges\Enums\Users as EnumsUsers;
+use Gewaer\Domains\Lounges\Models\Lounges;
+use Gewaer\Models\BaseModel;
+use Gewaer\Models\Users as ModelsUsers;
+
+class Users extends BaseModel
+{
+    public int $rooms_id;
+    public int $users_id;
+    public ?string $description = null;
+    public int $roles_id;
+    public int $is_active = 1;
+    public int $status = 1;
+    public int $has_raised_hand = 0;
+
+    /**
+     * Initialize method for model.
+     *
+     * @return void
+     */
+    public function initialize()
+    {
+        parent::initialize();
+        $this->setSource('room_users');
+
+        $this->belongsTo(
+            'lounges_id',
+            Lounges::class,
+            'id',
+            [
+                'alias' => 'lounge',
+            ]
+        );
+
+        $this->belongsTo(
+            'users_id',
+            ModelsUsers::class,
+            'id',
+            [
+                'alias' => 'user',
+                'reusable' => true,
+            ]
+        );
+    }
+
+    /**
+     * Validate fields.
+     *
+     * @return void
+     */
+    public function beforeValidation()
+    {
+        if ($this->status > EnumsUsers::INACTIVE) {
+            $this->status = EnumsUsers::INVITE;
+        }
+    }
+
+
+    /**
+     * Get user lounge.
+     *
+     * @param UserInterface $user
+     * @param Lounges $lounge
+     *
+     * @return self|null
+     */
+    public static function findFirstByUsersAndRoom(UserInterface $user, Rooms $room) : ?self
+    {
+        return self::findFirst([
+            'conditions' => 'rooms_id = :rooms_id: AND users_id = :users_id: AND is_deleted = 0',
+            'bind' => [
+                'rooms_id' => $room->getId(),
+                'users_id' => $user->getId()
+            ]
+        ]);
+    }
+}
