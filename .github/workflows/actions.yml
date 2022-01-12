@@ -11,7 +11,7 @@ env:
  #The next var creates the custom name for the current deployment to be referenced as ${{ env.instance_name }}
  #The var '${GITHUB_REPOSITORY#*/}' is traduced to the name of the repository, and the var '${GITHUB_REF##*/}' is traduced to the source branch
  #The varset  '${{ env.instance_name }}' is <repository name>-branch EG; kanvasapi-development.      
-  cluser_name: add-vpc-module-kanvas-api
+  cluser_name: fixing-nodes-kanvas-api
 
 jobs:
   build_and_deploy:
