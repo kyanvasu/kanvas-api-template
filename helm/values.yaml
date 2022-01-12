@@ -9,8 +9,8 @@ php:
   memoryLimit: 2128M
 
 namespace: template-api
-lbSSLCert: arn:aws:acm:us-east-1:346494590871:certificate/5eb3788e-671a-4534-8678-90edc36695d4
-apiImage: 346494590871.dkr.ecr.us-east-1.amazonaws.com/kanvasapi:latest
+#lbSSLCert: arn:aws:acm:us-east-1:
+apiImage: 858714440812.dkr.ecr.us-east-1.amazonaws.com/
 
 # Deployments Values
 deployments:
