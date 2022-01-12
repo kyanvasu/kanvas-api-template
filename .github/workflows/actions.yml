@@ -44,7 +44,7 @@ jobs:
         with:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          account_id: 346494590871
+          account_id: 858714440812
           repo: ${{ env.instance_name }}
           region: us-east-1
           create_repo: true
