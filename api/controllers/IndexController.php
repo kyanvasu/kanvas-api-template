@@ -19,7 +19,7 @@ class IndexController extends CanvasIndexController
      */
     public function index($id = null) : Response
     {
-        return $this->response(['Woot Booklounge']);
+        return $this->response(['Woot template']);
     }
 
     /**

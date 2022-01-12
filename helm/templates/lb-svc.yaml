@@ -7,7 +7,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: {{.Values.lbSSLCert}}
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-    service.beta.kubernetes.io/aws-load-balancer-name: booklounge-apidevops
+    service.beta.kubernetes.io/aws-load-balancer-name: template-apidevops
 spec:
   selector:
     app: {{.Values.services.loadBalancer.appName}}
