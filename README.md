@@ -94,16 +94,16 @@ The technologies selected to work fine with this CI/CD are:
 The steps of this pipeline are programed inside the repo at `./.github/workflows/actions.yml`
 
 
-## This pipeline need to fit some spesific vars: 
+### This pipeline needs to setup some spesific vars before run: 
 
-### At GitHub secrets scope.
+## At GitHub secrets scope.
 Go to the Settings/Secrets section of your GitHub Repo and configure the following secret vars:
 
 AWS_ACCESS_KEY_ID= Access key of the aws account with access rigths to the EKS cluster
 AWS_SECRET_ACCESS_KEY= Secret of the Access Key ID
 DEVELOPMENT_VARS= All content of your .env file filled with the access and configurations needed by the api (you can find an example at the repo `./.env.example` 
 
-### At `./.github/workflows/actions.yml` file scope:
+## At `./.github/workflows/actions.yml` file scope:
 Must replace the var `cluster_name`in the actions.yaml file with the name of your api's destination cluster that is in the AWS org of your configured aws account.
 
 Replace `account_id: ********` at "AWS ECR" step with the account ID of your Access KEY
