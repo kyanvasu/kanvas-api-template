@@ -11,7 +11,7 @@ env:
  #The next var creates the custom name for the current deployment to be referenced as ${{ env.instance_name }}
  #The var '${GITHUB_REPOSITORY#*/}' is traduced to the name of the repository, and the var '${GITHUB_REF##*/}' is traduced to the source branch
  #The varset  '${{ env.instance_name }}' is <repository name>-branch EG; kanvasapi-development.      
-  cluser_name: development-mctekk
+  cluster_name: development-mctekk
 
 jobs:
   build_and_deploy:
@@ -59,7 +59,7 @@ jobs:
             fi
             aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws eks update-kubeconfig   --region us-east-1   --name ${{ env.cluser_name }}
+            aws eks update-kubeconfig   --region us-east-1   --name ${{ env.cluster_name }}
             
 
             #create namespace if not exists
