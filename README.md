@@ -76,7 +76,7 @@ And on your contianer network info
 
 - Inside the container's console run `./vendor/bin/codecept run` 
 
-###CI/CD
+### CI/CD
 
 There's a CI/CD already defined for this api that is composed by:
 1. Helm Chart templates
@@ -93,14 +93,17 @@ The technologies selected to work fine with this CI/CD are:
 The steps of this pipeline are programed inside the repo at `./.github/workflows/actions.yml`
 
 
-##This pipeline need to fit some spesific vars: 
+## This pipeline need to fit some spesific vars: 
 
-#At GitHub secrets scope.
+# At GitHub secrets scope.
 Go to the Settings/Secrets section of your GitHub Repo and configure the following secret vars:
 
 AWS_ACCESS_KEY_ID= Access key of the aws account with access rigths to the EKS cluster
 AWS_SECRET_ACCESS_KEY= Secret of the Access Key ID
 DEVELOPMENT_VARS= All content of your .env file filled with the access and configurations needed by the api (you can find an example at the repo `./.env.example` 
 
-#At `./.github/workflows/actions.yml` file scope:
-Must replace the var `cluster_name`in the actions.yaml file with the name of your api's destination cluster
+# At `./.github/workflows/actions.yml` file scope:
+Must replace the var `cluster_name`in the actions.yaml file with the name of your api's destination cluster that is in the AWS org of your configured aws account.
+
+Replace `<account_id>` inside repo name (and region if necesary) `--set apiImage=<account_id>.dkr.ecr.us-east-1.amazonaws.com/${{ env.instance_name }}:latest` you'll find that line at "Devploy Helm chart" step.
+
