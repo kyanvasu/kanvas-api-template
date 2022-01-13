@@ -76,5 +76,31 @@ And on your contianer network info
 
 - Inside the container's console run `./vendor/bin/codecept run` 
 
-### TODO
-- Documentation
+###CI/CD
+
+There's a CI/CD already defined for this api that is composed by:
+1. Helm Chart templates
+2. GitHub Actions Pipeline
+
+The technologies selected to work fine with this CI/CD are:
+1. EKS (AWS's Kubernetes)
+2. GitHub/GitHub Actions 
+3. AWS CLI
+4. AWS ECR (container registry )
+5. Bash Scripting (so the agent worker must be Unix)
+
+
+The steps of this pipeline are programed inside the repo at `./.github/workflows/actions.yml`
+
+
+##This pipeline need to fit some spesific vars: 
+
+#At GitHub secrets scope.
+Go to the Settings/Secrets section of your GitHub Repo and configure the following secret vars:
+
+AWS_ACCESS_KEY_ID= Access key of the aws account with access rigths to the EKS cluster
+AWS_SECRET_ACCESS_KEY= Secret of the Access Key ID
+DEVELOPMENT_VARS= All content of your .env file filled with the access and configurations needed by the api (you can find an example at the repo `./.env.example` 
+
+#At `./.github/workflows/actions.yml` file scope:
+Must replace the var `cluster_name`in the actions.yaml file with the name of your api's destination cluster
