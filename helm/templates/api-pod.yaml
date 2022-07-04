@@ -43,6 +43,9 @@ spec:
       containers:
         - name: {{.Values.deployments.api.containerName}}
           image: {{.Values.apiImage}}
+          # envFrom:
+          # - configMapRef:
+          #     name: special-config
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
@@ -74,6 +77,7 @@ spec:
                     "/bin/sh",
                     "-c",
                     "cp -r /app/. /var/www/html && chmod -R 777 /var/www/html/. ",
+                    "while true; do php cli/cli.php 'Twitter\\Main' get-mention ; sleep 60; done"
                   ]
         - name: nginx
           image: nginx:1.18

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.deployments.queues.twitter.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Values.deployments.queues.twitter.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.deployments.queues.twitter.name}}
+        type: api
+    spec:
+      volumes:
+        - name: webroot
+          emptyDir: {}
+      containers:
+        - name: {{.Values.deployments.queues.twitter.containerName}}
+          image: {{.Values.apiImage}}
+          imagePullPolicy: Always
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "chmod -R 777 runCli && chmod -R 777 storage/cache/ && php cli/cli.php queue jobs twitter-import-image"
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          volumeMounts:
+            - name: webroot
+              mountPath: "/var/www/html"
+            - name: phpini
+              mountPath: /usr/local/etc/php/conf.d/phpupdate.ini
+              subPath: phpupdate.ini
+            - name: phpfpm
+              mountPath: /usr/local/etc/php-fpm.d/zzz-php-fpm-production.conf
+              subPath: zzz-php-fpm-production.conf
+            - name: phpwww
+              mountPath: /usr/local/etc/php-fpm/php-fpm.d/www.conf
+              subPath: www.conf
+      securityContext:
+        fsGroup: 65533
